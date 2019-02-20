@@ -7,6 +7,7 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+//document viewer: displays documents in a table
 public class DocumentView extends JFrame{
     
     private final JPanel main;
@@ -20,6 +21,7 @@ public class DocumentView extends JFrame{
     private final JScrollPane scrollpane;
     
     public DocumentView() {
+		//document viewer specifications including font, features, etc.
         this.setTitle("Document Analyzer");
         this.setLocationRelativeTo(null);
         
@@ -60,18 +62,23 @@ public class DocumentView extends JFrame{
         this.setVisible(true);
     }
     
+	//create a table
     private TableModel createTable() {
         TableModel m = new DefaultTableModel() {
+			
+			//amount of rows
             @Override
             public int getRowCount() {
                 return 25;
             }
 
+			//amount of columns
             @Override
             public int getColumnCount() {
                 return 2;
             }
 
+			//retrieves documents searched for
             @Override
             public Object getValueAt(int row, int col) {
                 switch (col) {
@@ -85,6 +92,8 @@ public class DocumentView extends JFrame{
         
         return m;
     }
+	
+	//create table columns
     private TableColumnModel createColumns(JTable table) {
         TableColumnModel columnModel = table.getColumnModel();
         
