@@ -1,16 +1,13 @@
-
-import javax.swing.JFrame;
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  *
  * @author wasim
  */
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
 public class LoginForm extends javax.swing.JFrame {
 
     /**
@@ -116,6 +113,11 @@ public class LoginForm extends javax.swing.JFrame {
 
         jButton1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jButton1.setText("Login");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jLabelRegister.setText("Create a new account?");
         jLabelRegister.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -215,6 +217,31 @@ public class LoginForm extends javax.swing.JFrame {
         rgf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.dispose();
     }//GEN-LAST:event_jLabelRegisterMouseClicked
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        try{
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/logindb", "root", "");
+            String sql = "Select * from logindatabase where username=? and password=?";
+            PreparedStatement pst = con.prepareStatement(sql);
+            pst.setString(1, username.getText());
+            pst.setString(2, password.getText());
+            ResultSet rs = pst.executeQuery();
+            if(rs.net()){
+                JOptionPane.showMessageDialog(null, "Login Successful!");
+            }
+            else{
+                JOptionPane.showMessageDialog(null, "Username and Passoword not correct!");
+                username.setText("");
+                password.setText("");
+            }
+            con.close();
+        }
+        catch(Exception e){
+            JOptionPane.showMessageDialog(null,e);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
