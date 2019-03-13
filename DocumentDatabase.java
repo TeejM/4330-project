@@ -13,12 +13,12 @@ public class DocumentDatabase {
     private PreparedStatement prepstmt = null;
     private ResultSet rs = null;
     
-    
+    //initial connection to the database
     public DocumentDatabase() {
-
+		//notify user of attempting to connect
         System.out.println("Connecting database...");
-
         try {
+			//creates new connection asking for url, name, and password
             Connection connection = DriverManager.getConnection(url, username, password);
             System.out.println("Database connected!");
         } catch (SQLException e) {
@@ -26,8 +26,10 @@ public class DocumentDatabase {
         }
     }
     
+	//system for adding documents to the database
     public void addDocument(String path) {
         try {
+			//attempts connection; if successful, document is added
             Connection connection = DriverManager.getConnection(url, username, password);
             //System.out.println("Connection successful");
             String query = "INSERT INTO documents (path) VALUES (?)";
@@ -36,6 +38,7 @@ public class DocumentDatabase {
             
             prepstmt.execute();
             
+			//notify user that the document was added to the table and close the connection
             System.out.println(path  + " added to table");
             
             connection.close();
@@ -46,6 +49,7 @@ public class DocumentDatabase {
         }
     }
     
+	//returning a requested document to the user
     public String getDocument(int doc_id) {
         String path = null;
         
@@ -53,10 +57,12 @@ public class DocumentDatabase {
             Connection connection = DriverManager.getConnection(url, username, password);
             //System.out.println("Database connected!");
             
+			//view contents from table
             String query = "SELECT * FROM documents";
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
             
+			//continue until everything requested is displayed
             while(rs.next()) {
                 int id = rs.getInt("id");
                 String filepath = rs.getString("path");
@@ -72,6 +78,7 @@ public class DocumentDatabase {
         }
     }
     
+	//adding a folder; similar to adding a document
     public void addFolder(String dir_path) {
         try {
             Connection connection = DriverManager.getConnection(url, username, password);
@@ -85,12 +92,14 @@ public class DocumentDatabase {
                     
                     File file = dir_list[i];
                     
+					//same process as adding a document
                     String query = "INSERT INTO documents (path) VALUES (?)";
                     prepstmt = connection.prepareStatement(query);
                     prepstmt.setString (1, file.getPath());
 
                     prepstmt.execute();
 
+					//notify user of success
                     System.out.println(file.getName() + " added to table");
                 }
             }
