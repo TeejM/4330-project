@@ -2,6 +2,8 @@ package documentanalyzer;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.io.IOException;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
@@ -13,7 +15,7 @@ public class DocumentView extends JFrame{
     private final JPanel main;
     private final JTable table;
     private final JTextField filterField;
-    private final JButton wordCloud, open;
+    private final JButton wordCloud, openDoc;
     private final JLabel filter;
     private TableModel model;
     private TableColumnModel columns;
@@ -21,7 +23,10 @@ public class DocumentView extends JFrame{
     private final JScrollPane scrollpane;
     
     public DocumentView() {
-		//document viewer specifications including font, features, etc.
+        
+        DocumentController.addView(this);
+        
+        //document viewer specifications including font, features, etc.
         this.setTitle("Document Analyzer");
         this.setLocationRelativeTo(null);
         
@@ -47,7 +52,7 @@ public class DocumentView extends JFrame{
         scrollpane.setPreferredSize(new Dimension(800,400));
         
         wordCloud = new JButton("Word Cloud");
-        open = new JButton("Open Document");
+        openDoc = new JButton("Open Document");
         
         filter = new JLabel("Filter:");
         
@@ -55,7 +60,7 @@ public class DocumentView extends JFrame{
         main.add(filterField);
         main.add(scrollpane);
         main.add(wordCloud);
-        main.add(open);
+        main.add(openDoc);
         
         this.add(main);
         
@@ -69,7 +74,7 @@ public class DocumentView extends JFrame{
 			//amount of rows
             @Override
             public int getRowCount() {
-                return 25;
+                return 2;
             }
 
 			//amount of columns
@@ -81,11 +86,13 @@ public class DocumentView extends JFrame{
 			//retrieves documents searched for
             @Override
             public Object getValueAt(int row, int col) {
-                switch (col) {
-                    case 0: return "Document " + row;
-                    case 1: return "Keyword1, Keyword2, Keyword3, Keyword4, Keyword5, Keyword6, Keyword7, Keyword8, Keyword9, Keyword10";
+                try {
+                    switch (col) {
+                        case 0: return DocumentController.getDocumentName(row);
+                        case 1: return DocumentController.getKeywords(row);
+                    }
+                } catch (IOException ioe) {
                 }
-                
                 return "";
             }
         };
@@ -106,4 +113,24 @@ public class DocumentView extends JFrame{
         return columnModel;
     }
     
+    public int getSelectedRow() {
+        return table.getSelectedRow();
+    }
+    
+    public String getSelectedName() {
+        return (String) table.getValueAt(table.getSelectedRow(), 0);
+    }
+    
+    public String[] getSelectedKeywords() {
+        String keywords = (String) table.getValueAt(table.getSelectedRow(), 1);
+        return keywords.split(", ");
+    }
+    
+    void addWordCloudListener(ActionListener wc) {
+        wordCloud.addActionListener(wc);
+    }
+    
+    void addOpenDocListener(ActionListener od) {
+        openDoc.addActionListener(od);
+    }
 }
