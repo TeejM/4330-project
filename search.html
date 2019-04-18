@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 
 <?php
-  $db = mysqli_connect('104.222.26.249:3306','root','password','documents')
-  or die('Error connecting to MySQL Server')
+  $db = mysqli_connect('104.222.26.249:3306','client','password','documents')
+  or die('Error connecting to MySQL Server');
 ?>
 
 <html style="background-color:#d3d3d3"><head>
@@ -78,7 +78,19 @@
     <th style="width:40%;">Country</th>
   </tr>
   <tr>
-    <td>Alfreds Futterkiste</td>
+    <td>
+      <?php
+        $query = "SELECT * FROM documents";
+        mysqli_query($db, $query) or die('Error querying database.');
+
+        $result = mysqli_query($db, $query);
+        $row = mysqli_fetch_array($result);
+
+        while ($row = mysqli_fetch_array($result)) {
+          echo $row['name'];
+        }
+      ?>
+    </td>
     <td>Germany</td>
   </tr>
   <tr>
