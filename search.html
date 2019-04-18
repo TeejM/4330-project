@@ -3,9 +3,9 @@
 <meta http-equiv="content-type" content="text/html; charset=UTF-8"><title>Title</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="4330_files/w3.css">
-<link rel="stylesheet" href="4330_files/w3-theme-black.css">
-<link rel="stylesheet" href="4330_files/font-awesome.css">
+<link rel="stylesheet" href="files/w3.css">
+<link rel="stylesheet" href="files/w3-theme-black.css">
+<link rel="stylesheet" href="files/font-awesome.css">
 </head><body id="vectorGameZ">
 
 <!-- Navbar -->
@@ -20,16 +20,115 @@
  </div>
 
 <!-- Page Content -->
-<br><br><br>
-<h1><center>Welcome</center></h1>
-<br><br><br>
+<style>
+* {
+  box-sizing: border-box;
+}
+
+#myInput {
+  background-image: url('files/searchicon.png');
+  background-position: 10px 10px;
+  background-repeat: no-repeat;
+  width: 100%;
+  font-size: 16px;
+  padding: 12px 20px 12px 40px;
+  border: 1px solid #ddd;
+  margin-bottom: 12px;
+}
+
+#myTable {
+  border-collapse: collapse;
+  width: 100%;
+  border: 1px solid #ddd;
+  font-size: 18px;
+}
+
+#myTable th, #myTable td {
+  text-align: left;
+  padding: 12px;
+}
+
+#myTable tr {
+  border-bottom: 1px solid #ddd;
+}
+
+#myTable tr.header, #myTable tr:hover {
+  background-color: #f1f1f1;
+}
+</style>
+</head>
+<body>
+
+<h2>Documents</h2>
+
+<input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for keywords.." title="Type in a name">
+
+<table id="myTable">
+  <tr class="header">
+    <th style="width:60%;">Name</th>
+    <th style="width:40%;">Country</th>
+  </tr>
+  <tr>
+    <td>Alfreds Futterkiste</td>
+    <td>Germany</td>
+  </tr>
+  <tr>
+    <td>Berglunds snabbkop</td>
+    <td>Sweden</td>
+  </tr>
+  <tr>
+    <td>Island Trading</td>
+    <td>UK</td>
+  </tr>
+  <tr>
+    <td>Koniglich Essen</td>
+    <td>Germany</td>
+  </tr>
+  <tr>
+    <td>Laughing Bacchus Winecellars</td>
+    <td>Canada</td>
+  </tr>
+  <tr>
+    <td>Magazzini Alimentari Riuniti</td>
+    <td>Italy</td>
+  </tr>
+  <tr>
+    <td>North/South</td>
+    <td>UK</td>
+  </tr>
+  <tr>
+    <td>Paris specialites</td>
+    <td>France</td>
+  </tr>
+</table>
+
+<script>
+function myFunction() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInput");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
 
 <!-- Footer -->
 <footer class="w3-container w3-padding-32 w3-theme-d1 w3-center">
   <p>CSC 4330</p>
   <p>Created using assets and stylesheets from W3Schools.</p>
   <div style="position:relative;bottom:100px;z-index:1;" class="w3-tooltip w3-right">
-    <span class="w3-text w3-padding w3-sand w3-hide-small">Go to top</span>   
+    <span class="w3-text w3-padding w3-sand w3-hide-small">Go to top</span>
     <a class="w3-button w3-theme" href="#vectorGameZ"><span class="w3-xlarge">
     ^</span></a>
   </div>
