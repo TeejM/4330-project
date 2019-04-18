@@ -75,36 +75,22 @@ $db_name = "documents";
 //create connection
 $connection = mysqli_connect($host, $user, $pass, $db_name);
 
-//test if connection failed
-if(mysqli_connect_errno()){
-    die("connection failed: "
-        . mysqli_connect_error()
-        . " (" . mysqli_connect_errno()
-        . ")");
+mysqli_select_db($db_name, $connection) or die("Oops some thing went wrong");// we are now connected to database
+
+$result = mysqli_query("SELECT * FROM documents"); // selecting data through mysql_query()
+
+echo '<table border=1px>';  // opening table tag
+echo'<th>No</th><th>Name</th>'; //table headers
+
+while($data = mysqli_fetch_array($result))
+{
+// we are running a while loop to print all the rows in a table
+echo'<tr>'; // printing table row
+echo '<td>'.$data['id'].'</td><td>'.$data['name'].'</td>'; // we are looping all data to be printed till last row in the table
+echo'</tr>'; // closing table row
 }
 
-//get results from database
-$result = mysqli_query($connection,"SELECT * FROM documents");
-$all_property = array();  //declare an array for saving property
-
-//showing property
-echo '<table class="data-table">
-        <tr class="data-heading">';  //initialize table tag
-while ($property = mysqli_fetch_field($result)) {
-    echo '<td>' . $property->name . '</td>';  //get field name for header
-    array_push($all_property, $property->name);  //save those to array
-}
-echo '</tr>'; //end tr tag
-
-//showing all data
-while ($row = mysqli_fetch_array($result)) {
-    echo "<tr>";
-    foreach ($all_property as $item) {
-        echo '<td>' . $row[$item] . '</td>'; //get items using property value
-    }
-    echo '</tr>';
-}
-echo "</table>";
+echo '</table>';  //closing table tag
 ?>
 
 <script>
