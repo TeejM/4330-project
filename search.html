@@ -1,10 +1,4 @@
 <!DOCTYPE html>
-
-<?php
-  $db = mysqli_connect('104.222.26.249:3306','client','password','documents')
-  or die('Error connecting to MySQL Server');
-?>
-
 <html style="background-color:#d3d3d3"><head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8"><title>Title</title>
 <meta charset="UTF-8">
@@ -35,7 +29,7 @@
 }
 
 #myInput {
-  background-image: url('/files/searchicon.png');
+  background-image: url('files/searchicon.png');
   background-position: 10px 10px;
   background-repeat: no-repeat;
   width: 100%;
@@ -72,56 +66,46 @@
 
 <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for keywords.." title="Type in a name">
 
-<table id="myTable">
-  <tr class="header">
-    <th style="width:60%;">Name</th>
-    <th style="width:40%;">Country</th>
-  </tr>
-  <tr>
-    <td>
-      <?php
-        $query = "SELECT * FROM documents";
-        mysqli_query($db, $query) or die('Error querying database.');
+<?php
+$host    = "104.222.26.249:3306";
+$user    = "client";
+$pass    = "password";
+$db_name = "documents";
 
-        $result = mysqli_query($db, $query);
-        $row = mysqli_fetch_array($result);
+//create connection
+$connection = mysqli_connect($host, $user, $pass, $db_name);
 
-        while ($row = mysqli_fetch_array($result)) {
-          echo $row['name'];
-        }
-      ?>
-    </td>
-    <td>Germany</td>
-  </tr>
-  <tr>
-    <td>Berglunds snabbkop</td>
-    <td>Sweden</td>
-  </tr>
-  <tr>
-    <td>Island Trading</td>
-    <td>UK</td>
-  </tr>
-  <tr>
-    <td>Koniglich Essen</td>
-    <td>Germany</td>
-  </tr>
-  <tr>
-    <td>Laughing Bacchus Winecellars</td>
-    <td>Canada</td>
-  </tr>
-  <tr>
-    <td>Magazzini Alimentari Riuniti</td>
-    <td>Italy</td>
-  </tr>
-  <tr>
-    <td>North/South</td>
-    <td>UK</td>
-  </tr>
-  <tr>
-    <td>Paris specialites</td>
-    <td>France</td>
-  </tr>
-</table>
+//test if connection failed
+if(mysqli_connect_errno()){
+    die("connection failed: "
+        . mysqli_connect_error()
+        . " (" . mysqli_connect_errno()
+        . ")");
+}
+
+//get results from database
+$result = mysqli_query($connection,"SELECT * FROM documents");
+$all_property = array();  //declare an array for saving property
+
+//showing property
+echo '<table class="data-table">
+        <tr class="data-heading">';  //initialize table tag
+while ($property = mysqli_fetch_field($result)) {
+    echo '<td>' . $property->name . '</td>';  //get field name for header
+    array_push($all_property, $property->name);  //save those to array
+}
+echo '</tr>'; //end tr tag
+
+//showing all data
+while ($row = mysqli_fetch_array($result)) {
+    echo "<tr>";
+    foreach ($all_property as $item) {
+        echo '<td>' . $row[$item] . '</td>'; //get items using property value
+    }
+    echo '</tr>';
+}
+echo "</table>";
+?>
 
 <script>
 function myFunction() {
