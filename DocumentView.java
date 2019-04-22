@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
@@ -34,6 +36,32 @@ public class DocumentView extends JFrame{
         
         filterField = new JTextField();
         filterField.setPreferredSize(new Dimension(300, 25));
+        
+        filterField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent de) {
+                String text = filterField.getText();
+                
+                if (text.trim().length() == 0)
+                    tableFilter.setRowFilter(null);
+                else
+                    tableFilter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent de) {
+                String text = filterField.getText();
+                
+                if (text.trim().length() == 0)
+                    tableFilter.setRowFilter(null);
+                else
+                    tableFilter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent de) {
+            } 
+        });
         
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(900,550);
@@ -74,7 +102,7 @@ public class DocumentView extends JFrame{
 			//amount of rows
             @Override
             public int getRowCount() {
-                return 2;
+                return 16;
             }
 
 			//amount of columns

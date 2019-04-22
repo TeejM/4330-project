@@ -1,18 +1,25 @@
 package documentanalyzer;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.*;
+import javax.swing.JFileChooser;
 
 public class DocumentDatabase {
     
-    String url = "jdbc:mysql://localhost:3306/documents";
-    String username = "client";
-    String password = "password";
+    String url = "jdbc:mysql://mydbinstance.cat14r8phmlw.us-east-1.rds.amazonaws.com:3306/documents";
+    String username = "tjmathews";
+    String password = "4330groupproject";
     
     private Statement statement = null;
     private PreparedStatement prepstmt = null;
     private ResultSet rs = null;
-    
+    private String directory = new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
+    private Connection connection;
     
     public DocumentDatabase() {
 
@@ -21,7 +28,7 @@ public class DocumentDatabase {
         System.out.println("Connecting database...");
 
         try {
-            Connection connection = DriverManager.getConnection(url, username, password);
+            connection = DriverManager.getConnection(url, username, password);
             System.out.println("Database connected!");
         } catch (SQLException e) {
             throw new IllegalStateException("Cannot connect the database!", e);
@@ -30,8 +37,6 @@ public class DocumentDatabase {
     
     public void addDocument(String path) {
         try {
-            Connection connection = DriverManager.getConnection(url, username, password);
-            //System.out.println("Connection successful");
             String query = "INSERT INTO documents (path) VALUES (?)";
             prepstmt = connection.prepareStatement(query);
             prepstmt.setString (1, path);
@@ -39,66 +44,89 @@ public class DocumentDatabase {
             prepstmt.execute();
             
             System.out.println(path  + " added to table");
-            
-            connection.close();
-            
-            //System.out.println("Connection closed");
         } catch (SQLException e) {
             throw new IllegalStateException("Cannot connect the database!", e);
         }
     }
     
-    public String getDocument(int doc_id) {
-        String path = null;
-        //System.out.println(doc_id);
-        try {
-            Connection connection = DriverManager.getConnection(url, username, password);
-            //System.out.println("Database connected!");
-            
+    public String getName (int doc_id)
+    {
+        String name = null;
+        try {        
             String query = "SELECT * FROM documents";
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
             
             while(rs.next()) {
                 int id = rs.getInt("id");
-                String filepath = rs.getString("path");
                 if (id == doc_id) {
-                    path = filepath;
+                    name = rs.getString("name");
                     break;
                 }
             }
-            //System.out.println(path);
-            return path;
+
+            return name;
         } catch (SQLException e) {
             throw new IllegalStateException("Cannot connect the database!", e);
         }
     }
     
-    public void addFolder(String dir_path) {
+    public File getDocument(int doc_id) throws FileNotFoundException, IOException {
+        String path = null;
+        File file = null;
+        FileOutputStream fos;
+        byte[] buffer;
+        InputStream is;
         try {
-            Connection connection = DriverManager.getConnection(url, username, password);
-            //System.out.println("Connection successful");
+            String query = "SELECT * FROM documents";
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
             
+            while(rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                if (id == doc_id) {
+                    file = new File(directory + name);
+                    fos = new FileOutputStream(file);
+                    
+                    buffer = new byte[1];
+                    is = rs.getBinaryStream(3);
+                    while(is.read(buffer) > 0)
+                    {
+                        fos.write(buffer);
+                    }
+                    fos.close();
+                    break;
+                }
+            }
+            return file;
+        } catch (SQLException e) {
+            throw new IllegalStateException("Cannot connect the database!", e);
+        }
+    }
+    
+    public void addFolder(String dir_path) throws FileNotFoundException {
+        try {
             File dir = new File(dir_path);
+            FileInputStream fis;
             File[] dir_list = dir.listFiles();
             
             if (dir_list != null) {
                 for(int i = 0; i < dir_list.length; i++) {
                     
                     File file = dir_list[i];
+                    fis = new FileInputStream(file);
                     
-                    String query = "INSERT INTO documents (path) VALUES (?)";
+                    String query = "INSERT INTO documents (name, file) VALUES (?, ?)";
                     prepstmt = connection.prepareStatement(query);
-                    prepstmt.setString (1, file.getPath());
+                    prepstmt.setString(1, file.getName());
+                    prepstmt.setBinaryStream (2, fis, (int) file.length());
 
                     prepstmt.execute();
 
                     System.out.println(file.getName() + " added to table");
                 }
             }
-            connection.close();
-            
-            //System.out.println("Connection closed");
         } catch (SQLException e) {
             throw new IllegalStateException("Cannot connect the database!", e);
         }
@@ -109,8 +137,6 @@ public class DocumentDatabase {
         
         boolean empty = false;
         try {
-            Connection connection = DriverManager.getConnection(url, username, password);
-            //System.out.println("Database connected!");
             
             //statement to delete all records in table "documents"
             String query = "DELETE FROM documents";
@@ -133,7 +159,7 @@ public class DocumentDatabase {
             }
             else
                 System.out.println("Table not empty");
-            
+
             return empty;
         } catch (SQLException e) {
             throw new IllegalStateException("Cannot connect the database!", e);

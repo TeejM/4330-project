@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public final class DocumentController {
     
@@ -23,11 +25,10 @@ public final class DocumentController {
     }
     
     public static String getDocumentName(int doc_id) {
-        String path = db.getDocument(doc_id + 1);
-        return new File(path).getName();
+        return db.getName(doc_id + 1);
     }
     
-    public static String getDocument(int doc_id) {
+    public static File getDocument(int doc_id) throws IOException {
         return db.getDocument(doc_id);
     }
     
@@ -52,9 +53,15 @@ public final class DocumentController {
 
         @Override
         public void actionPerformed(ActionEvent ae) {
-            File doc = new File(db.getDocument(dv.getSelectedRow() + 1));
+            File doc = null;
+            try {
+                doc = db.getDocument(dv.getSelectedRow() + 1);
+            } catch (IOException ex) {
+                Logger.getLogger(DocumentController.class.getName()).log(Level.SEVERE, null, ex);
+            }
             Desktop dt = Desktop.getDesktop();
             try {
+                //ParseText.highlight(doc, ParseText.sortByFrequency(ParseText.findKeywords(db.getDocument(dv.getSelectedRow() + 1))));
                 dt.open(doc);
             } catch (IOException ex) {
             }

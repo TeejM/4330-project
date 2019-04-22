@@ -12,43 +12,37 @@ import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+import javax.swing.JFileChooser;
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.hwpf.extractor.WordExtractor;
+import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.xwpf.usermodel.XWPFRun;
 
 public final class ParseText {
 
+    private static Set<String> stopWords;
+    private static String directory = new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
+    
     private ParseText() {
     }
 
-    private static final List<String> insignificant = new ArrayList<>();
-
-    public static void populateList() {
-        insignificant.add("the");
-        insignificant.add("a");
-        insignificant.add("an");
-        insignificant.add("and");
-        insignificant.add("with");
-        insignificant.add("or");
-        insignificant.add("of");
-        insignificant.add("for");
-        insignificant.add("this");
-        insignificant.add("in");
-        insignificant.add("is");
-        insignificant.add("that");
-        insignificant.add("it");
-        insignificant.add("as");
-        insignificant.add("to");
-        insignificant.add("such");
-        insignificant.add("than");
-        insignificant.add("then");
+    public static void createStopwords() throws FileNotFoundException, IOException {
+        stopWords = new LinkedHashSet<>();
+        BufferedReader br = new BufferedReader(new FileReader("stopwords.txt"));
+        for(String line;(line = br.readLine()) != null;)
+           stopWords.add(line.trim());
+        br.close();
     }
-
-    public static LinkedHashMap<String, Integer> findKeywords(String path) throws IOException {
+    
+    public static LinkedHashMap<String, Integer> findKeywords(File file) throws IOException {
 
         LinkedHashMap<String, Integer> keywords = new LinkedHashMap<>();
-
+        String path = file.getAbsolutePath();
+        
         if (path.endsWith("txt")) {
-            FileReader doc = new FileReader(path);
+            FileReader doc = new FileReader(file);
             BufferedReader text = new BufferedReader(doc);
             StringBuffer buffer = new StringBuffer("");
             String line = null;
@@ -58,7 +52,7 @@ public final class ParseText {
                     buffer.append(line);
                     String[] words = line.replaceAll("[^a-zA-Z]", " ").toLowerCase().split(" "); //replace all non-alphabet characters, makes all words lower case, splits words by space
                     for (String word : words) {
-                        if (!word.isEmpty() && !insignificant.contains(word)) {
+                        if (!word.isEmpty() && !stopWords.contains(word)) {
                             Integer freq = keywords.get(word);
                             if (freq == null) {
                                 keywords.put(word, 1);
@@ -71,17 +65,36 @@ public final class ParseText {
                 text.close();
             }
         } else if (path.endsWith("doc")) {
-            File file;
             WordExtractor extractor;
             try {
-                file = new File(path);
                 FileInputStream fis = new FileInputStream(file.getAbsolutePath());
                 HWPFDocument doc = new HWPFDocument(fis);
                 extractor = new WordExtractor(doc);
                 String fileText = extractor.getText();
                 String[] words = fileText.replaceAll("[^a-zA-Z]", " ").toLowerCase().split(" ");
                 for (String word : words) {
-                    if (!word.isEmpty() && !insignificant.contains(word)) {
+                    if (!word.isEmpty() && !stopWords.contains(word)) {
+                        Integer freq = keywords.get(word);
+                        if (freq == null) {
+                            keywords.put(word, 1);
+                        } else {
+                            keywords.put(word, freq + 1);
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (path.endsWith("docx")) {
+            XWPFWordExtractor extractor;
+            try {
+                FileInputStream fis = new FileInputStream(file.getAbsolutePath());
+                XWPFDocument doc = new XWPFDocument(fis);
+                extractor = new XWPFWordExtractor(doc);
+                String fileText = extractor.getText();
+                String[] words = fileText.replaceAll("[^a-zA-Z]", " ").toLowerCase().split(" ");
+                for (String word : words) {
+                    if (!word.isEmpty() && !stopWords.contains(word)) {
                         Integer freq = keywords.get(word);
                         if (freq == null) {
                             keywords.put(word, 1);
@@ -105,7 +118,6 @@ public final class ParseText {
                 .sorted(Entry.comparingByValue(Comparator.reverseOrder()))
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
 
-        //System.out.println(sortedMap);
         String[] temp = sortedMap.keySet().toArray(new String[10]);
 
         System.arraycopy(temp, 0, keywords, 0, 10);
@@ -128,7 +140,7 @@ public final class ParseText {
         wordCloud.setFontScalar(new LinearFontScalar(10, 40));
         wordCloud.build(wf);
         
-        String savepath = "C:/Users/TJ/Desktop/" + filename.substring(0, filename.length() - 4) + "_wordcloud.png";
+        String savepath = directory + filename.substring(0, filename.length() - 4) + "_wordcloud.png";
         
         wordCloud.writeToFile(savepath);
         
@@ -136,4 +148,33 @@ public final class ParseText {
         Desktop dt = Desktop.getDesktop();
         dt.open(image);
     }
+    
+    //non-functioning
+    /* public static void highlight(File file, String[] keywords) throws FileNotFoundException, IOException {
+        
+        FileInputStream fis = new FileInputStream(file);
+        XWPFDocument doc = new XWPFDocument(fis);
+        String[] colors = {
+            "BLUE", "YELLOW", "RED", "GREEN", "CYAN", "MAGNETA", "DARK_GREEN", "DARK_BLUE", "DARK_YELLOW", "DARK_RED"
+        };
+        
+        for (int i = 0; i < 10; i++)
+        {
+            for (XWPFParagraph p : doc.getParagraphs())
+            {
+                List<XWPFRun> runs = p.getRuns();
+                for (XWPFRun r : runs)
+                {
+                    String text = r.getText(0);
+                    if (text.contains(keywords[i]))
+                    {
+                        r.setTextHighlightColor(colors[i]);
+                        System.out.println("Highlighted " + r.getText(0));
+                    }
+                }
+            }
+        }
+        doc.write(new FileOutputStream(file));
+    }
+    */
 }
