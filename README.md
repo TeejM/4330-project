@@ -1,13 +1,12 @@
 # 4330-project
 CSC 4330 Group Project
 
-Wasim Alam
+  Group Members
 
-Shannon Conway
-
-Taylor Mathews
-
-Sean Sheehan
+    Wasim Alam
+    Shannon Conway
+    Taylor Mathews
+    Sean Sheehan
 
 Required Libraries:
 
