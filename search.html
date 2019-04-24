@@ -1,27 +1,24 @@
 <!DOCTYPE html>
-<html style="background-color:#d3d3d3"><head>
+<html style="background-image: linear-gradient(#fdf5e6,white,white);"><head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8"><title>Title</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="files/w3.css">
 <link rel="stylesheet" href="files/w3-theme-black.css">
 <link rel="stylesheet" href="files/font-awesome.css">
-</head><body id="vectorGameZ">
+</head><body id="csc4330">
 
 <!-- Navbar -->
 <div class="w3-top">
  <div class="w3-bar w3-theme-d2 w3-left-align">
-  <a href="index.html" class="w3-bar-item w3-button w3-sand w3-hover-white">Title</a>
+  <a href="index.html" class="w3-bar-item w3-button w3-sand w3-hover-white">CSC 4330, Team A</a>
   <a href="login.html" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Log In</a>
   <a href="register.html" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Register</a>
   <a href="search.html" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Search</a>
-  <a href="contactus.html" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Contact Us</a>
  </div>
  </div>
 
 <!-- Page Content -->
-<div class="w3-display-container w3-animate-opacity">
-</div>
 <br><br><br>
 <style>
 * {
@@ -62,57 +59,19 @@
 </head>
 <body>
 
-<h2>Documents</h2>
+<center><h2>Search by Keywords</h2></center>
+<br><br>
 
-<input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for keywords.." title="Type in a name">
-
-<?php
-$host    = "104.222.26.249:3306";
-$user    = "client";
-$pass    = "password";
-$db_name = "documents";
-
-//create connection
-$connection = mysqli_connect($host, $user, $pass, $db_name);
-
-mysqli_select_db($db_name, $connection) or die("Oops some thing went wrong");// we are now connected to database
-
-$result = mysqli_query("SELECT * FROM documents"); // selecting data through mysql_query()
-
-echo '<table border=1px>';  // opening table tag
-echo'<th>No</th><th>Name</th>'; //table headers
-
-while($data = mysqli_fetch_array($result))
-{
-// we are running a while loop to print all the rows in a table
-echo'<tr>'; // printing table row
-echo '<td>'.$data['id'].'</td><td>'.$data['name'].'</td>'; // we are looping all data to be printed till last row in the table
-echo'</tr>'; // closing table row
-}
-
-echo '</table>';  //closing table tag
-?>
-
-<script>
-function myFunction() {
-  var input, filter, table, tr, td, i, txtValue;
-  input = document.getElementById("myInput");
-  filter = input.value.toUpperCase();
-  table = document.getElementById("myTable");
-  tr = table.getElementsByTagName("tr");
-  for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[0];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
-      }
-    }
-  }
-}
-</script>
+<br><br>
+<center><div class="search">
+  <input type="text" placeholder="Keyword 1..." name="search1"><br><br>
+  <input type="text" placeholder="Keyword 2..." name="search2"><br><br>
+  <input type="text" placeholder="Keyword 3..." name="search3"><br><br>
+  <input type="text" placeholder="Keyword 4..." name="search4"><br><br>
+  <br><br>
+  <button type="submit">Search</button>
+</div></center>
+<br><br><br><br>
 
 <!-- Footer -->
 <footer class="w3-container w3-padding-32 w3-theme-d1 w3-center">
@@ -120,7 +79,7 @@ function myFunction() {
   <p>Created using assets and stylesheets from W3Schools.</p>
   <div style="position:relative;bottom:100px;z-index:1;" class="w3-tooltip w3-right">
     <span class="w3-text w3-padding w3-sand w3-hide-small">Go to top</span>
-    <a class="w3-button w3-theme" href="#vectorGameZ"><span class="w3-xlarge">
+    <a class="w3-button w3-theme" href="#csc4330"><span class="w3-xlarge">
     ^</span></a>
   </div>
 </footer>
